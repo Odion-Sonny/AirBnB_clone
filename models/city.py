@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 """
-City class module
+Module that defines a class City inherit from BaseModel
 """
 from models.base_model import BaseModel
 
 
 class City(BaseModel):
-    """class City which inherits from BaseModel"""
+    """Class City"""
     state_id = ""
     name = ""
+
+    def __init__(self, *args, **kwargs):
+        """init model"""
+        super().__init__(*args, **kwargs)

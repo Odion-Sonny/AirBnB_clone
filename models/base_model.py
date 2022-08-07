@@ -1,63 +1,40 @@
 #!/usr/bin/python3
-"""
-Base class module
-"""
+''' module for BaseModel class '''
 from uuid import uuid4
 from datetime import datetime
-import models
+from . import storage
 
 
 class BaseModel:
-    """class BaseModel
-     This is the Base Model that take care of the
-     initialization, serialization and deserialization
-     of the future instances.
-    """
-    def __init__(self, *args, **kwargs):
-        """Initializes instance of BaseModel class"""
+    ''' class of the base model of higher-level data models '''
+    def __init__(self, *arg, **kwargs):
+        ''' BaseModel constructor '''
         if kwargs:
-            for key, value in kwargs.items():
-                if key == "created_at" or key == "updated_at":
-                    setattr(self, key, datetime.strptime(
-                        value,
-                        "%Y-%m-%dT%H:%M:%S.%f"))
-                elif key == '__class__':
-                    continue
-                else:
-                    setattr(self, key, value)
+            for k in kwargs:
+                if k in ['created_at', 'updated_at']:
+                    setattr(self, k, datetime.fromisoformat(kwargs[k]))
+                elif k != '__class__':
+                    setattr(self, k, kwargs[k])
         else:
             self.id = str(uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            models.storage.new(self)
-
-    def __str__(self):
-        """Prints a BaseModel Instance"""
-        return "[{:s}] ({:s}) {}".format(
-            self.__class__.__name__,
-            self.id,
-            self.__dict__
-        )
-
-    def __repr__(self):
-        """Prints a BaseModel Instance"""
-        return "[{:s}] ({:s}) {}".format(
-            self.__class__.__name__,
-            self.id,
-            self.__dict__
-        )
+            self.created_at = datetime.utcnow()
+            self.updated_at = self.created_at.replace()
+            storage.new(self)
 
     def save(self):
-        """Updates the public instance attribute updated_at with the current
-        datetime."""
-        self.updated_at = datetime.now()
-        models.storage.save()
+        ''' saves a model '''
+        self.updated_at = datetime.utcnow()
+        storage.save()
 
     def to_dict(self):
-        """returns a dictionary containing all keys/values of __dict__
-        of the instance."""
-        retval = (self.__dict__).copy()
-        retval['created_at'] = retval['created_at'].isoformat()
-        retval['updated_at'] = retval['updated_at'].isoformat()
-        retval['__class__'] = self.__class__.__name__
-        return retval
+        ''' returns a dictionary representation of the model '''
+        dct = self.__dict__.copy()
+        dct['__class__'] = self.__class__.__name__
+        dct['created_at'] = self.created_at.isoformat()
+        dct['updated_at'] = self.updated_at.isoformat()
+        return dct
+
+    def __str__(self):
+        ''' returns a string representation of the model '''
+        return '[{}] ({}) {}'.format(
+            self.__class__.__name__, self.id, self.__dict__)

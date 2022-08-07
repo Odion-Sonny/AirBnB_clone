@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 """
-This module contains the Place class
+Module that defines a class Place inherit from BaseModel
 """
 from models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    """
-    Place class
-    """
+    """Class Place"""
     city_id = ""
     user_id = ""
     name = ""
@@ -20,3 +18,7 @@ class Place(BaseModel):
     latitude = 0.0
     longitude = 0.0
     amenity_ids = []
+
+    def __init__(self, *args, **kwargs):
+        """init model"""
+        super().__init__(*args, **kwargs)
